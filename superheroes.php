@@ -63,12 +63,34 @@ $superheroes = [
     ], 
 ];
 
-// Output the superhero aliases as HTML
-echo '<ul>';
-foreach ($superheroes as $superhero) {
-    echo '<li>' . $superhero['alias'] . '</li>';
-}
-echo '</ul>';
+$query = isset($_GET['query']) ? $_GET['query'] : '';
 
+if (empty($query)) {
+    // If no search query, display the full list of aliases as a bulleted list
+    echo '<ul>';
+    foreach ($superheroes as $superhero) {
+        echo '<li>' . $superhero['alias'] . '</li>';
+    }
+    echo '</ul>';
+} else {
+    // If there is a search query, find matching superheroes
+    $results = array_filter($superheroes, function ($superhero) use ($query) {
+        return stripos($superhero['name'], $query) !== false || stripos($superhero['alias'], $query) !== false;
+    });
+
+    if (!empty($results)) {
+        // Display the matching heroes
+        foreach ($results as $result) {
+            echo '<h3>' . $result['alias'] . '</h3>';
+            if ($result['name'] != $result['alias']) {
+                echo '<p>A.K.A ' . $result['name'] . '</p>';
+            }
+            echo '<p>' . $result['biography'] . '</p>';
+        }
+    } else {
+        // Display an error message if no superhero matches the search
+        echo '<p style="color: red;">Superhero not found</p>';
+    }
+}
 
 ?>
